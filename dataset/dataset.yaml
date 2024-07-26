@@ -1,0 +1,5 @@
+train: C:\Users\Özgür\Desktop\dataset\dataset\images\train 
+val: C:\Users\Özgür\Desktop\dataset\dataset\images\val 
+
+nc: 2  
+names: ['man', 'woman']  

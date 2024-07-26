@@ -1,34 +1,47 @@
 import cv2
 from ultralytics import YOLO
 
-def main():
-    # YOLO modelini yükle
-    model = YOLO('yolov8n.pt')
 
-    # Kamerayı başlat
-    cap = cv2.VideoCapture(0)
+model = YOLO('C:/Users/Özgür/Desktop/dataset/yolov8n.pt') 
+cap = cv2.VideoCapture(0)
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-        # Modeli kullanarak tahmin yap
-        results = model(frame)
+    
+    results = model(frame)
 
-        # Sonuçları görselleştir
-        annotated_frame = results[0].plot()
+    
+    for result in results:
+        for box in result.boxes:
+            
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            conf = box.conf[0]
+            cls = int(box.cls[0])
+            
+            
+            if cls == 0 or cls == 1:  
+                label = 'Male' if cls == 0 else 'Female'
+                   
+                center_x = (x1 + x2) // 3
+                center_y = (y1 + y2) // 3
 
-        # Sonuçları ekranda göster
-        cv2.imshow('YOLOv8 Cinsiyet Tanıma', annotated_frame)
+               
+                print(f"Box coordinates: ({x1}, {y1}), ({x2}, {y2})")
+                print(f"Confidence: {conf}, Class: {cls}, Label: {label}")
 
-        # 'q' tuşuna basarak çık
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+                
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 4)  
+                cv2.putText(frame, f'{label} {conf:.2f}', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36, 255, 12), 1)  
 
-    # Kaynakları serbest bırak
-    cap.release()
-    cv2.destroyAllWindows()
+   
+    cv2.imshow('Gender Detection', frame)
 
-if __name__ == "__main__":
-    main()
+   
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
